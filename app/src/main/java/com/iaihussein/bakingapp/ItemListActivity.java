@@ -14,6 +14,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * An activity representing a list of Items. This activity
  * has different presentations for handset and tablet-size devices. On
@@ -30,6 +33,12 @@ public class ItemListActivity extends AppCompatActivity {
      * device.
      */
     private boolean mTwoPane;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.txt_ingredients)
+    TextView mIngredientsTextView;
+@BindView(R.id.item_list)
+    View recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +48,9 @@ public class ItemListActivity extends AppCompatActivity {
             mRecipe = (Recipe) savedInstanceState.getSerializable(Variables.SELECTED_RECIPE);
         else
             mRecipe = (Recipe) getIntent().getSerializableExtra(Variables.SELECTED_RECIPE);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
         toolbar.setTitle(mRecipe.getName());
         setSupportActionBar(toolbar);
-        TextView mIngredientsTextView = (TextView) findViewById(R.id.txt_ingredients);
         String mIngredients = "Ingredients are :\n";
         for (Ingredient i :
                 mRecipe.getIngredients()) {
@@ -51,7 +58,6 @@ public class ItemListActivity extends AppCompatActivity {
         }
         mIngredientsTextView.setText(mIngredients);
 
-        View recyclerView = findViewById(R.id.item_list);
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
 

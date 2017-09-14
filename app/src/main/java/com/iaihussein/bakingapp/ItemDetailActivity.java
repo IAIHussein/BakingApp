@@ -7,6 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * An activity representing a single Item detail screen. This
  * activity is only used narrow width devices. On tablet-size devices,
@@ -15,11 +18,15 @@ import android.view.MenuItem;
  */
 public class ItemDetailActivity extends AppCompatActivity {
 
+    @BindView(R.id.detail_toolbar)
+    Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_detail);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
+        ButterKnife.bind(this);
+
         toolbar.setTitle(((Recipe) getIntent().getSerializableExtra(Variables.SELECTED_RECIPE)).getName());
         setSupportActionBar(toolbar);
 

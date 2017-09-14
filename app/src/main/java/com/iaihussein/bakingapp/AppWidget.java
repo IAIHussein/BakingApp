@@ -19,7 +19,7 @@ public class AppWidget extends AppWidgetProvider {
                                 int appWidgetId) {
         String mTitleText = "", mDisplayText = "";
         String mResponse = context.getSharedPreferences(Variables.SHARED_PREFERENCE, Context.MODE_PRIVATE).getString(Variables.SP_RESPONSE, null);
-        if (mResponse != null || mResponse.isEmpty()) {
+        if (mResponse != null && !mResponse.isEmpty()) {
             List<Recipe> mRecipes = new Gson().fromJson(mResponse, new TypeToken<List<Recipe>>() {
             }.getType());
             mTitleText = mRecipes.get(0).getName() + " Ingredients are :";

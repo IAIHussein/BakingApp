@@ -17,6 +17,12 @@ import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import com.devbrackets.android.exomedia.listener.OnPreparedListener;
+import com.devbrackets.android.exomedia.ui.widget.EMVideoView;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * A fragment representing a single Item detail screen.
  * This fragment is either contained in a {@link ItemListActivity}
@@ -24,14 +30,20 @@ import android.widget.VideoView;
  * on handsets.
  */
 public class ItemDetailFragment extends Fragment {
-    VideoView mVideoView;
+    @BindView(R.id.video_view)
+    EMVideoView mVideoView;
+    @BindView(R.id.item_detail)
     TextView mDescTextView;
-    Button mPrevButton, mNextButton;
+    @BindView(R.id.btn_previous)
+    Button mPrevButton;
+    @BindView(R.id.btn_next)
+    Button mNextButton;
     /**
      * The dummy content this fragment is presenting.
      */
     private Step mStep;
     private Recipe mRecipe;
+    private static int playerPosition;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -43,7 +55,6 @@ public class ItemDetailFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (getArguments().containsKey(Variables.ARG_ITEM)) {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
@@ -51,8 +62,8 @@ public class ItemDetailFragment extends Fragment {
             mRecipe = (Recipe) getArguments().getSerializable(Variables.SELECTED_RECIPE);
             mStep = (Step) getArguments().getSerializable(Variables.ARG_ITEM);
 
-            Activity activity = this.getActivity();
-            AppBarLayout appBarLayout = (AppBarLayout) activity.findViewById(R.id.app_bar);
+
+            AppBarLayout appBarLayout = (AppBarLayout) getActivity().findViewById(R.id.app_bar);
             if (appBarLayout != null&&getResources().getConfiguration().orientation== Configuration.ORIENTATION_LANDSCAPE) {
                 appBarLayout.setVisibility(View.GONE);
             }
@@ -63,10 +74,7 @@ public class ItemDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.item_detail, container, false);
-        mVideoView = (VideoView) rootView.findViewById(R.id.videoView);
-        mDescTextView = (TextView) rootView.findViewById(R.id.item_detail);
-        mPrevButton = (Button) rootView.findViewById(R.id.btn_previous);
-        mNextButton = (Button) rootView.findViewById(R.id.btn_next);
+        ButterKnife.bind(this,rootView);
 
         setData();
 
@@ -75,6 +83,7 @@ public class ItemDetailFragment extends Fragment {
             public void onClick(View view) {
                 mStep = mRecipe.getSteps().get(mStep.getId() - 1);
                 getArguments().putSerializable(Variables.ARG_ITEM, mStep);
+                playerPosition=0;
                 setData();
 
             }
@@ -84,6 +93,7 @@ public class ItemDetailFragment extends Fragment {
             public void onClick(View view) {
                 mStep = mRecipe.getSteps().get(mStep.getId() + 1);
                 getArguments().putSerializable(Variables.ARG_ITEM, mStep);
+                playerPosition=0;
                 setData();
 
             }
@@ -96,15 +106,13 @@ public class ItemDetailFragment extends Fragment {
         mDescTextView.setText(mStep.getDescription());
         if (mStep.getVideoURL() != null && !mStep.getVideoURL().isEmpty()) {
             mVideoView.setVisibility(View.VISIBLE);
-            final MediaController mMediaController = new MediaController(getContext(), true);
-            mMediaController.setEnabled(false);
-            mVideoView.setMediaController(mMediaController);
             mVideoView.setVideoPath(mStep.getVideoURL());
-            mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            mVideoView.setOnPreparedListener(new OnPreparedListener() {
                 @Override
-                public void onPrepared(MediaPlayer mediaPlayer) {
-                    mMediaController.setEnabled(true);
+                public void onPrepared() {
                     mVideoView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                    if(playerPosition!=0)
+                        mVideoView.seekTo(playerPosition);
                     mVideoView.start();
                 }
             });
@@ -118,7 +126,14 @@ public class ItemDetailFragment extends Fragment {
         if (mVideoView != null && mVideoView.isPlaying()) {
             mVideoView.stopPlayback();
             mVideoView = null;
+            playerPosition = mVideoView.getCurrentPosition();
         }
         super.onPause();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        playerPosition = mVideoView.getCurrentPosition();
+        super.onSaveInstanceState(outState);
     }
 }

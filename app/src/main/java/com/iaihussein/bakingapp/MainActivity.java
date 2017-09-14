@@ -20,7 +20,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MainActivity extends AppCompatActivity {
+    @BindView(R.id.main_grid)
+    GridView mMainGridView;
     SharedPreferences mSharedPreferences;
     List<Recipe> mRecipes;
     AsyncTask<String, String, String> mAsyncTask = new AsyncTask<String, String, String>() {
@@ -28,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... strings) {
             try {
-                URL mUrl = new URL("https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json");
+                URL mUrl = new URL(Variables.URL);
                 HttpURLConnection mHttpURLConnection = (HttpURLConnection) mUrl.openConnection();
 
                 if (mHttpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
@@ -57,12 +62,13 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
     };
-    GridView mMainGridView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(MainActivity.this);
         mSharedPreferences = getSharedPreferences(Variables.SHARED_PREFERENCE, Context.MODE_PRIVATE);
         String mData = mSharedPreferences.getString(Variables.SP_RESPONSE, "");
         if (mData.isEmpty())
@@ -72,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
             }.getType());
 
         }
-        mMainGridView = (GridView) findViewById(R.id.main_grid);
+
         mMainGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {

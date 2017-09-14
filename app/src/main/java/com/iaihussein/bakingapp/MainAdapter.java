@@ -9,6 +9,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MainAdapter extends BaseAdapter {
 
 
@@ -34,7 +37,8 @@ public class MainAdapter extends BaseAdapter {
     public long getItemId(int position) {
         return position;
     }
-
+    @BindView(R.id.cellview_name_txt)
+    TextView mTextView;
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) mContext
@@ -45,10 +49,8 @@ public class MainAdapter extends BaseAdapter {
         } else {
             view = convertView;
         }
-        TextView mTextView = (TextView) view.findViewById(R.id.cellview_name_txt);
+        ButterKnife.bind(this,view);
         mTextView.setText(mList.get(position).getName());
-//        ImageView imageView = (ImageView) view.findViewById(R.id.imgViewId);
-//        Picasso.with(mContext).load(Var.URL_IMAGE + mList.get(position).getBackdropPath()).into(imageView);
         return view;
     }
 
